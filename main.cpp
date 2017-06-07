@@ -3,6 +3,8 @@
 #include <iostream>
 #include <boost/algorithm/string.hpp>
 #include <sys/wait.h>
+#include <fstream>
+#include <string>
 #define BOOST_NO_CXX11_SCOPED_ENUMS
 #undef BOOST_NO_CXX11_SCOPED_ENUMS
 
@@ -24,6 +26,55 @@ int eternal_functions(char * argv[]) {
             }
     }
 }
+
+void func_cd(int size_of, char *commands[]){
+    if (size_of > 2) {
+        cout << "To much arguments" << endl;
+    }
+    else if (size_of != 1) {
+        cout << commands[1] << endl;
+        if (strcmp(commands[1],"-h") == 0 || strcmp(commands[1],"--help") == 0) {
+            cout << "cd <path> [-h|--help]  -- перейти до шляху <path> " << endl;
+        }
+        else {
+            chdir(commands[1]);
+        }
+    }
+    else {
+        cout << "We need at least 1 argument" << endl;
+    }
+}
+
+void func_pwd(int size_of, char *commands[]){
+    if (size_of > 2) {
+        cout << "To much arguments" << endl;
+    } else if (size_of != 1) {
+        if (strcmp(commands[1], "-h") == 0 || strcmp(commands[1], "--help") ==0) {
+            cout << "pwd [-h|--help] – вивести поточний шлях" << endl;
+        } else {
+            cout << "Incorrect command" << endl;
+        }
+    } else {
+        char cwd[1024];
+        cout << getcwd(cwd, sizeof(cwd)) << endl;
+    }
+}
+
+void func_exit(int size_of, char *commands[]){
+    if (size_of > 2) {
+        cout << "To much arguments" << endl;
+    } else if (size_of != 1) {
+        if (strcmp(commands[1], "-h") == 0 || strcmp(commands[1], "--help") == 0) {
+            cout << "exit [код завершення] [-h|--help]  – вийти " << endl;
+        } else {
+            cout << "Incorrect command" << endl;
+        }
+    }
+    else {
+        exit(1);
+    }
+}
+
 int main() {
     char path_str[1024] = "PATH=";
     char *original_path;
@@ -44,69 +95,16 @@ int main() {
         for (size_t i = 0; i < strings.size(); ++i)
             commands[i] = const_cast<char *>(strings[i].c_str());
         commands[strings.size()] = NULL;
-        if (strcmp(commands[0], "pwd") == 0) {
-            if (size_of > 2) {
-                cout << "To much arguments" << endl;
-            } else if (size_of != 1) {
-                if (strcmp(commands[1], "-h") == 0 || strcmp(commands[1], "--help") ==0) {
-                    cout << "pwd [-h|--help] – вивести поточний шлях" << endl;
-                } else {
-                    cout << "Incorrect command" << endl;
-                }
-            } else {
-                char cwd[1024];
-                cout << getcwd(cwd, sizeof(cwd)) << endl;
-            }
-        }
-
-
-        if (strcmp(commands[0],"exit") == 0) {
-            if (size_of > 2) {
-                cout << "To much arguments" << endl;
-            } else if (size_of != 1) {
-                if (strcmp(commands[1], "-h") == 0 || strcmp(commands[1], "--help") == 0) {
-                    cout << "exit [код завершення] [-h|--help]  – вийти " << endl;
-                } else {
-                    cout << "Incorrect command" << endl;
-                }
-
-            } else {
-                exit(1);
-            }
-        }
         if (strcmp(commands[0], "cd") == 0) {
-            if (size_of > 2) {
-                cout << "To much arguments" << endl;
-            } else if (size_of != 1) {
-                cout << commands[1] << endl;
-                if (strcmp(commands[1],"-h") == 0 || strcmp(commands[1],"--help") == 0) {
-                    cout << "cd <path> [-h|--help]  -- перейти до шляху <path> " << endl;
-                } else {
-                    chdir(commands[1]);;
-                }
-            } else {
-                cout << "We need at least 1 argument" << endl;
-            }
+            func_cd(size_of, commands);
         }
-        if (strcmp(commands[0],"mkdir") == 0){
-            if (strcmp(commands[1], "-h") == 0 || strcmp(commands[1], "--help") == 0)
-            {
-                cout << "mkdir [-h|--help]  <dirname> – створити директорію" << endl;
-            }
-            else {
-                eternal_functions(commands);
-            }
+        else if (strcmp(commands[0], "pwd") == 0) {
+            func_pwd(size_of, commands);
         }
-        if (strcmp(commands[0],"rm") == 0){
-            if (strcmp(commands[1], "-h") == 0 || strcmp(commands[1], "--help") == 0)
-            {
-                cout << "rm [-h|--help]  <dirname> – видалити директорію" << endl;
-            }
-
-            else{
-                eternal_functions(commands);
-            }
-        }else{
+        else if (strcmp(commands[0],"exit") == 0) {
+            func_exit(size_of,commands);
+        }
+        else{
             eternal_functions(commands);
         }
     }

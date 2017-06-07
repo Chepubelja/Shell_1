@@ -207,7 +207,7 @@ int main (int argc, char* argv[])
             }
         }else {
             if(!is_mask.empty()){
-//                is_mask = is_mask.substr(1,is_mask.size() + 1);
+                is_mask = is_mask.substr(1,is_mask.size() + 1);
                 print_ls(list_of_files,is_mask);
             }else {
                 print_ls(list_of_files,"");
